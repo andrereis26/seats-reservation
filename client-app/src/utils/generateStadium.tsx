@@ -81,8 +81,8 @@ export function calculateFieldSize(stadium: Stadium) {
   const leftCols = stadium.sides.left.sections[0]?.rows[0]?.seats.length || 0;
   const rightCols = stadium.sides.right.sections[0]?.rows[0]?.seats.length || 0;
 
-  // Example: scale each seat to 12px "space"
-  const seatSize = 12;
+  // Example: scale each seat to 15px "space" + 4px "gap"
+  const seatSize = 15 + 4;
 
   const width =
     Math.max(
