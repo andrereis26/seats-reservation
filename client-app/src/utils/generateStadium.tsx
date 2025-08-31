@@ -25,6 +25,10 @@ export type Stadium = {
     left: Side;
     right: Side;
   };
+  field?: {
+    width: number;
+    height: number;
+  };
 };
 
 export function generateStadium(
@@ -70,3 +74,29 @@ export function generateStadium(
     },
   };
 }
+
+export function calculateFieldSize(stadium: Stadium) {
+  const topRows = stadium.sides.up.sections[0]?.rows.length || 0;
+  const bottomRows = stadium.sides.down.sections[0]?.rows.length || 0;
+  const leftCols = stadium.sides.left.sections[0]?.rows[0]?.seats.length || 0;
+  const rightCols = stadium.sides.right.sections[0]?.rows[0]?.seats.length || 0;
+
+  // Example: scale each seat to 12px "space"
+  const seatSize = 12;
+
+  const width =
+    Math.max(
+      topRows,
+      bottomRows,
+      stadium.sides.up.sections.reduce(
+        (acc, s) => acc + (s.rows[0]?.seats.length || 0),
+        0
+      )
+    ) * seatSize;
+
+  const height =
+    Math.max(leftCols, rightCols) * seatSize;
+
+  return { width, height };
+}
+

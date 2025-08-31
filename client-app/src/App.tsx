@@ -29,7 +29,7 @@ function App() {
     );
 
     // store stadium in sessionStorage (or context)
-    sessionStorage.setItem("stadium", JSON.stringify(stadium));
+    localStorage.setItem("stadium", JSON.stringify(stadium));
 
     const randomId = Math.floor(Math.random() * 1000);
     navigate(`/event/${randomId}`);
