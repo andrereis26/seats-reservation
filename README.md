@@ -8,7 +8,7 @@ This project aims to explore:
 ## Stack used TODO: justify the use of each thing 
 - React + Vite
 - Socket.io + REST+ Typescript (Elixir or Go would prolly be a better fit for this in terms of efficiency)
-- Reddis + Postgres
+- Redis + Postgres
 - REST APIs + Typescript (Elixir or Go would prolly be a better fit for this in terms of efficiency)
 - Kafka
 - Docker
@@ -18,12 +18,14 @@ This project aims to explore:
 ### Reservation Service (write-side, command handler)
 - Source of truth for seat changes (atomic ops in Redis).
 - Emits events (seat.held, seat.reserved, seat.released).
+- Shares its database (Redis) with [Seat State Read Service](#seat-state-read-service-query-side-for-seat-map).
 
 ### Reservation Persistence Service (final persistence)
 - Subscribes only to seat.reserved events.
 - Writes completed reservations into a dedicated Postgres table: reservation(id, event_id, user_id, seat_ids, timestamp)
 - Purpose: historical record / downstream consumption (payments, reporting, exports, etc).
 - Keeps the “golden truth” of what actually got sold.
+- Has its own Postgres database.
 
 ### Seat State Read Service (query-side for seat map)
 - Provides initial seat map when a client connects.
@@ -48,4 +50,6 @@ This project aims to explore:
 - For initial load: calls Seat State, Read and Stats services.
 - For real-time: subscribes to seat.* and stats.updated events and broadcasts to clients.
 
-Here's a simple view of how the micro services interact with each other / how data flows between our micro services - _ignoring infra-structure for better understanting on a base level, this will be addressed later_
+Here's the logical view of level 2 (in C4 model) of our platform to help understand the interactions between services - _ignoring infra-structure for better understanting on a base level, this will be addressed later_
+
+![Logical View - Level 2](docs/logicalView_lvl2.svg)
