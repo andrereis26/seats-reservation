@@ -1,7 +1,7 @@
 import Fastify, { FastifyRequest } from "fastify";
 import { Server as SocketIOServer } from "socket.io";
 import { createServer } from "http";
-import config from "./src/conf/config";
+import config from "./conf/config";
 import { setupWorker } from "@socket.io/sticky";
 
 // for Dependency Injection
@@ -9,14 +9,14 @@ import "reflect-metadata";
 import { container } from "tsyringe";
 
 // services
-import SeatsService from "./src/seats/services/SeatService";
-import ISeatsService from "./src/seats/services/ISeatService";
+import SeatService from "./seats/services/SeatService";
+import ISeatService from "./seats/services/ISeatService";
 
 // handlers
-import { SeatHandle } from "./src/seats/handlers/SeatHandle";
+import SeatHandle from "./seats/handlers/SeatHandle";
 
 // register DI bindings
-container.register<ISeatsService>("ISeatsService", { useClass: SeatsService });
+container.register<ISeatService>("ISeatService", { useClass: SeatService });
 
 // create Fastify instance
 const fastify = Fastify();

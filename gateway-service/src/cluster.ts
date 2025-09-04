@@ -1,15 +1,14 @@
 import cluster from "cluster";
 import http from "http";
 import { setupMaster } from "@socket.io/sticky";
-import server from "./server.js";
-import config from "./conf/config.ts";
+import server from "./server";
+import config from "./conf/config";
 
-const WORKERS_COUNT = 4; // or const numCPUs = require("os").cpus().length;
 
 if (cluster.isPrimary) {
     console.debug(`Primary ${process.pid} is running`);
 
-    for (let i = 0; i < WORKERS_COUNT; i++) {
+    for (let i = 0; i < config.numWorkers; i++) {
         cluster.fork();
     }
 
