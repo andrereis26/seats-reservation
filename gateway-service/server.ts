@@ -11,12 +11,15 @@ import { container } from "tsyringe";
 // services
 import SeatsService from "./src/seats/services/SeatService";
 import ISeatsService from "./src/seats/services/ISeatService";
+import EventService from "./src/events/services/EventService";
+import IEventService from "./src/events/services/IEventService";
 
 // handlers
 import SeatHandle from "./src/seats/handlers/SeatHandle";
 
 // register DI bindings
 container.register<ISeatsService>("ISeatsService", { useClass: SeatsService });
+container.register<IEventService>("IEventService", { useClass: EventService });
 
 // create Fastify instance
 const fastify = Fastify();
