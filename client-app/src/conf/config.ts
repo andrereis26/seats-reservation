@@ -4,22 +4,29 @@ const config = {
     seats: "/seats/",
     stats: "/stats/",
   },
-  socketUrl: {
-    base: "http://localhost:3000",
-    events: "/events/",
-    stats: "/stats/",
+  gatewayServer: {
+    url: "http://localhost:3000",
+    endpoints: {
+      events: "/events/",
+      stats: "/stats/"
+    },
+    messages: {
+      reserve: "seat.reserve",
+      release: "seat.release",
+    },
+    maxReconnectionAttempts: 5,
   },
   seatStates: {
     free: {
-        value: "free",
-        color: "green",
+      value: "free",
+      color: "green",
     },
     reserved: {
-        value: "reserved",
-        color: "red",
+      value: "reserved",
+      color: "red",
     },
     selected: {
-        color: "yellow",
+      color: "yellow",
     },
   },
 };

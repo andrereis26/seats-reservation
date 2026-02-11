@@ -1,6 +1,7 @@
 import { useParams } from "react-router-dom";
 import { calculateFieldSize, type Stadium } from "../utils/generateStadium";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import gatewayServerSocket from "../socketio/gatewayServerSocket";
 import config from "../conf/config";
 
 export default function Event() {
@@ -41,6 +42,9 @@ export default function Event() {
       } else {
         target.style.background = config.seatStates.selected.color;
         newSelected.add(seatId);
+
+        // call gateway to reserve seat 
+
       }
       return newSelected;
     });
@@ -49,6 +53,41 @@ export default function Event() {
   if (!stadium?.sides) return <p>No stadium generated yet.</p>;
 
   const { width, height } = calculateFieldSize(stadium); // automatic calculation of field size
+
+  // connect to gateway server and join event room
+  useEffect(() => {
+    // connect to gateway server
+    gatewayServerSocket.connect();
+
+    // join event room
+    gatewayServerSocket.emit("joinEvent", { eventId: id });
+
+    // listen for seat reservation updates
+    gatewayServerSocket.on("seatReserved", (data: any) => {
+      const seatId = data.seatId;
+      // update seat status in stadium
+      for (const sideKey in stadium.sides) {
+        const side = (stadium.sides as any)[sideKey];
+        for (const section of side.sections) {
+          for (const row of section.rows) {
+            for (const seat of row.seats) {
+              if (seat.id === seatId) {
+                seat.status = config.seatStates.reserved.value;
+              }
+            }
+          }
+        }
+      }
+      // update local storage
+      localStorage.setItem("stadium", JSON.stringify(stadium));
+      // force re-render
+      setSelectedSeats(new Set(selectedSeats));
+    });
+
+    return () => {
+      gatewayServerSocket.disconnect();
+    };
+  }, []);
 
   return (
     <div>
