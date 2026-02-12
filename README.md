@@ -67,11 +67,10 @@ The platform is composed of several independent services, each responsible for a
 ## 🛠️ Tech Stack
 
 - **Frontend:** React + Vite
-- **APIs & Real-time:** Socket.io, REST, TypeScript
+- **APIs & Real-time:** Socket.io, REST, TypeScript, Express
 - **Datastores:** Redis, Postgres
 - **Messaging:** Kafka
 - **Containerization:** Docker
-- **Other:** (to be added)
 
 > _Each technology is chosen to illustrate a specific architectural or operational concept. See individual service READMEs for details._
 
