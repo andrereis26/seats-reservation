@@ -18,6 +18,7 @@ coverage/
 *.vpp~
 *.vpp.autosave
 *.vpp.lock
+*.vpp.lck
 *.vpp.bak_*
 
 # Logs

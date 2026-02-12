@@ -20,49 +20,57 @@ graph TB
     User([Web Application])
     
     subgraph Platform["SeatsReservation Platform"]
-        ClientApp["Client App"]
-        Gateway["Gateway Socket.IO"]
+        ClientApp["Client App<br/>(React + Socket.IO)"]
+        Gateway["Gateway Service<br/>(Socket.IO + REST)"]
         
         subgraph BackendServices["Backend Services"]
-            SeatStateRead["Seat State Read<br/>Service"]
-            ReservationService["Reservation<br/>Persistence Service"]
-            StatsWorker["Stats Processing Service<br/>worker"]
-            StatsRead["Stats Read Service"]
+            SeatStateRead["Seat State Read<br/>Service<br/>(Query-side)"]
+            ReservationService["Reservation<br/>Service<br/>(Command Handler)"]
+            ReservationPersistence["Reservation<br/>Persistence Service"]
+            StatsWorker["Stats Worker<br/>Service<br/>(Projector)"]
+            StatsRead["Stats Read<br/>Service"]
         end
         
-        MessageBroker["Message Broker<br/>Kafka"]
+        MessageBroker["Message Broker<br/>Kafka<br/>(Commands + Domain Events)"]
     end
     
     User -->|uses| ClientApp
     
-    ClientApp -->|"commands hold,<br/>commit, release"| Gateway
-    ClientApp -->|"REST API InitialLoads<br/>provides endpoints to query the<br/>current seat state + statistics"| Gateway
-    ClientApp -->|"subscribe seat +<br/>stats updated events"| Gateway
+    ClientApp -->|"Socket.IO<br/>emit: seat:hold,<br/>seat:commit, seat:release"| Gateway
+    ClientApp <-->|"Socket.IO<br/>broadcast: seat-updated,<br/>stats-updated"| Gateway
     
-    Gateway -->|"WebSockets/Socket.IO API<br/>emit updates..."| ClientApp
+    Gateway -->|"REST GET<br/>Initial Load"| SeatStateRead
+    Gateway -->|"REST GET<br/>Initial Load"| StatsRead
     
-    Gateway -->|"REST API Seat States<br/>queries to the current seat states"| SeatStateRead
+    Gateway -->|"Publish Commands<br/>seat.holdRequest,<br/>seat.commitRequest,<br/>seat.releaseRequest"| MessageBroker
     
-    Gateway -->|"REST API Statistics<br/>queries statistics"| StatsRead
+    MessageBroker -->|"Subscribe<br/>Domain Events<br/>seat.held, seat.reserved,<br/>seat.released, stats.updated"| Gateway
     
-    SeatStateRead -.->|"These 2 services<br/>share the same DB<br/>Redis"| ReservationService
+    MessageBroker -->|"Consume Commands"| ReservationService
     
-    ReservationService -.->|"Later we'll have another<br/>service to read the data that<br/>this Service persists<br/>They will share the same DB"| MessageBroker
+    ReservationService -->|"Publish Domain Events<br/>seat.held,<br/>seat.reserved,<br/>seat.released"| MessageBroker
     
-    SeatStateRead -->|"Notify API<br/>publish domain..."| MessageBroker
+    ReservationService -.->|"Shares Redis DB<br/>(write-side)"| SeatStateRead
+    SeatStateRead -.->|"Reads from<br/>same Redis"| ReservationService
     
-    StatsWorker -->|"Notify API<br/>publish..."| MessageBroker
+    MessageBroker -->|"Subscribe<br/>seat.reserved"| ReservationPersistence
     
-    MessageBroker -->|"Publish API<br/>subscribes to..."| SeatStateRead
-    MessageBroker -->|"Publish API<br/>subscribe..."| StatsWorker
+    ReservationPersistence -->|"Writes to<br/>Postgres"| ReservationPersistence
     
-    ReservationService -->|"subscribe<br/>seat-reserved events"| MessageBroker
+    MessageBroker -->|"Subscribe<br/>All Seat Events"| StatsWorker
+    
+    StatsWorker -->|"Publish<br/>stats.updated"| MessageBroker
+    
+    StatsWorker -->|"Writes Projections<br/>to Postgres"| StatsWorker
+    
+    StatsRead -.->|"Reads from<br/>same Postgres"| StatsWorker
     
     style MessageBroker fill:#766921
     style ClientApp fill:#a0a0a0
-    style Gateway fill:#
+    style Gateway fill:#2d5a7b
     style SeatStateRead fill:#362176
     style ReservationService fill:#762121
+    style ReservationPersistence fill:#7b4848
     style StatsWorker fill:#762154
     style StatsRead fill:#217661
 ```

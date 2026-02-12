@@ -59,6 +59,7 @@ The platform is composed of several independent services, each responsible for a
 - Contains zero business logic
 - For initial load: calls Seat State Read and Stats services
 - For real-time: subscribes to `seat.*` and `stats.updated` events and broadcasts to clients
+- Publishes client events (`seat.hold`, `seat.confirmation.request`, `seat.release`) to the Message Broker (Kafka) for the Reservation Service to consume
 
 </details>
 
@@ -87,6 +88,19 @@ Below is a C4 Level 2 logical view of the platform, showing service interactions
 ## 📁 Service Structure
 
 Each service lives in its own directory with a dedicated README. See those files for implementation, API, and deployment details.Here's a quick overview of each service
+
+---
+
+## 📚 Architecture Decision Records
+
+This project documents important architectural decisions using ADRs (Architecture Decision Records). These explain why certain design choices were made and their tradeoffs.
+
+👉 **[View All Architecture Decisions](docs/adr/README.md)**
+
+Key decisions:
+- [ADR-001: Event-Driven Commands Pattern](docs/adr/001-event-driven-commands-pattern.md) - Why Gateway emits command events instead of calling REST APIs
+- [ADR-002: REST for Initial Load](docs/adr/002-rest-for-initial-load.md) - Why we use synchronous REST for queries
+- [ADR-003: Gateway Event Subscription](docs/adr/003-gateway-event-subscription.md) - Why Gateway subscribes to its own domain events
 
 ---
 
