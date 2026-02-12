@@ -15,8 +15,9 @@ const config = {
   socket: {
     messages: {
       joinEvent: "event.join",
-      reserve: "seat.reserve",
-      release: "seat.release",
+      confirmationRequest: "seat.confirmationRequest",
+      releaseRequest: "seat.releaseRequest",
+      holdRequest: "seat.holdRequest",
     },
   },
 };

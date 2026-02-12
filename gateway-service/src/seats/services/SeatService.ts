@@ -9,13 +9,18 @@ export default class SeatService implements ISeatService {
         return [];
     }
 
-    async reserveSeats(eventId: string, seats: SeatDto[]): Promise<boolean> {
-        console.info(`Reserving seats for event ID: ${eventId}`);
+    async holdSeatsRequest(eventId: string, seats: SeatDto[]): Promise<boolean> {
+        console.info(`Holding seats for event ID: ${eventId}`);
         return true;
     }
 
-    async releaseSeats(eventId: string, seats: SeatDto[]): Promise<boolean> {
+    async releaseSeatsRequest(eventId: string, seats: SeatDto[]): Promise<boolean> {
         console.info(`Releasing seats for event ID: ${eventId}`);
+        return true;
+    }
+
+    async confirmSeatsRequest(eventId: string, seats: SeatDto[]): Promise<boolean> {
+        console.info(`Confirming seat request for event ID: ${eventId}`);
         return true;
     }
 }

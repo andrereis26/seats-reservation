@@ -14,19 +14,27 @@ export default class SeatHandle {
   }
 
   register(io: SocketIOServer<any>, socket: Socket<any>) {
-    // Handle seat reservation
-    const handleSeatsReservation = (data: SeatsReservationDto) => {
+
+    const handleSeatHoldRequest = (data: SeatsReservationDto) => {
       // Optionally use this.seatsService here
-      io.emit(config.socket.messages.reserve, data);
+      io.emit(config.socket.messages.holdRequest, data);
     };
 
-    const handleSeatsRelease = (data: SeatsReleaseDto) => {
+    const handleSeatsReleaseRequest = (data: SeatsReleaseDto) => {
       // Optionally use this.seatsService here
-      io.emit(config.socket.messages.release, data);
+      io.emit(config.socket.messages.releaseRequest, data);
+    };
+
+    // Handle seat confirmation request
+    const handleSeatsConfirmationRequest = (data: SeatsReservationDto) => {
+      // Optionally use this.seatsService here
+      io.emit(config.socket.messages.confirmationRequest, data);
     };
 
     // define event listeners
-    socket.on(config.socket.messages.reserve, handleSeatsReservation);
-    socket.on(config.socket.messages.release, handleSeatsRelease);
+    socket.on(config.socket.messages.holdRequest, handleSeatHoldRequest);
+    socket.on(config.socket.messages.releaseRequest, handleSeatsReleaseRequest);
+    socket.on(config.socket.messages.confirmationRequest, handleSeatsConfirmationRequest);
+
   }
 }
